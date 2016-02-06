@@ -1,6 +1,6 @@
 function evaluate
 global rooms individuals y_span x_span Pheno objectives Objective generation_num ..
-sample_num
+sample_num Desirable_area
 
 ProportionWeight=[0.75,0.5,1,1,1,0.25,0];//LR,DK,BR1,BR2,BR3,WA,Path
 //No Zero except for Path!

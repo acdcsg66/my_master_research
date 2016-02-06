@@ -1,6 +1,8 @@
 //(c)2006-2008 Makoto Inoue
 //Takagi-Lab, Graduate School of Design, Kyushu University
 
+lines(0);
+
 //関数を組み込む
 exec randGeno.sci
 exec growPheno.sci
@@ -33,6 +35,8 @@ Objective=zeros(individuals,objectives,generations,samples);
 //個体・目的・世代・サンプル数ごとの評価値
 mutationRate=0.01; //突然変異率0～1
 
+draw_picture=zeros(x_span+2,y_span+2);
+
 getdate()
 //main loop////////////////////////////////////////////////////////////////////
 schedule();
@@ -43,6 +47,10 @@ for sample_num=1:samples
     growPheno();
     //IEC(Display&Evaluate)
     //xset("wpdim",700,300)
+    for individual_num=1:individuals
+      subplot(3,7,individual_num);
+      Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
+    end
     evaluate();
     pseudoEvaluate();
     pareto();
@@ -50,9 +58,10 @@ for sample_num=1:samples
     selectPair();
     geneManipulate(); 
   end //for generation_num
-  for individual_num=1:individuals
-    subplot(3,7,individual_num);
-    Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
+//debug: 場所を上に移動
+//  for individual_num=1:individuals
+//    subplot(3,7,individual_num);
+//    Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
   end
 end //for sample_num
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,24 +69,24 @@ getdate()
 
 
 //4目的のグラフ
-ObjectiveMean=zeros(generations,4);
-for generation_num=1:generations
-    for objective_num=1:4
-      ObjectiveMean(generation_num,objective_num)=..
-      mean(Objective(:,objective_num,generation_num,:));
-    end
-end
-scf(); //Open New Figure
-xgrid();
-plot2d(1:generations,ObjectiveMean,rect=[0,0.5,generations,1],style=[1,1,1,1,1,1,1]);
-A=gca();
-P=A.children.children;
-P(4).line_style=1; P(4).thickness=2;
-P(3).line_style=2; P(3).thickness=2;
-P(2).line_style=3; P(2).thickness=2;
-P(1).line_style=4; P(1).thickness=2;
-xtitle('4 Objectives','Generation','Fitness');
-legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting',4); 
+//ObjectiveMean=zeros(generations,4);
+//for generation_num=1:generations
+//    for objective_num=1:4
+//      ObjectiveMean(generation_num,objective_num)=..
+//      mean(Objective(:,objective_num,generation_num,:));
+//    end
+//end
+//scf(); //Open New Figure
+//xgrid();
+//plot2d(1:generations,ObjectiveMean,rect=[0,0.5,generations,1],style=[1,1,1,1,1,1,1]);
+//A=gca();
+//P=A.children.children;
+//P(4).line_style=1; P(4).thickness=2;
+//P(3).line_style=2; P(3).thickness=2;
+//P(2).line_style=3; P(2).thickness=2;
+//P(1).line_style=4; P(1).thickness=2;
+//xtitle('4 Objectives','Generation','Fitness');
+//legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting',4); 
 
 
 //6目的のグラフ
