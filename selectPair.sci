@@ -53,11 +53,10 @@ FitnessNormal=Fitness2/sum(Fitness2); //‚»‚ê‚ð³‹K‰»
 
 Pair=zeros(children,2);
 for children_num=1:children
-
   //parent1
   parent1=0;
   roulette=rand();
-    for individual_num=1:individuals
+  for individual_num=1:individuals
     if roulette>FitnessNormal(individual_num)
       roulette=roulette-FitnessNormal(individual_num);
     else

@@ -1,17 +1,19 @@
 function growPheno
 
-global individuals rooms x_span y_span rooms Geno Pheno
+global individuals rooms x_span y_span rooms Geno Pheno Desirable_area
 
 //フェノタイプ（表現型）雛形の作成
 //rooms' name & character & desirable-area(m^2)
 //0=Void 8=commonCorridor 9=veranda 10=wall+Obstruction
 Pheno=zeros(x_span+2,y_span+2,individuals);
-Pheno(1,1:y_span+2,:)=8;
-Pheno(x_span+2,2:y_span+1,:)=9;
+Pheno(1,1:y_span+2,:)=8,Pheno(x_span+2,2:y_span+1,:)=9;
 Pheno(2:x_span+2,1,:)=10;
 Pheno(2:x_span+2,y_span+2,:)=10;
 
-
+end_flag=0; // 成長をやめることを判断するフラグ
+//Direction_flag=zeros(rooms,4); // 部屋、方向ごとに成長するかを判断するフラグ
+seed_distance=zeros(rooms,4,individuals); // 種から部屋の端までの距離
+growth_area=zeros(rooms,4,individuals); // 各方向ごとに成長できるエリアの面積
 
 //put Geno points into Pheno
 for individual_num=1:individuals
@@ -23,158 +25,215 @@ for individual_num=1:individuals
   end
 end
 
-
-
-//grow Pheno points
+//成長可能エリアのカウント
 for individual_num=1:individuals
-  Direction_flag=zeros(rooms,4);
-  for growth=1:max(x_span-1,y_span-1)
-    for room_num=1:rooms
-    //Point means coordinate of seed
-    Point=Geno(room_num,1:2,individual_num);
-      
-      //North start
-      if Direction_flag(room_num,1)==0
-        for check_room=Point(2)-growth+1:Point(2)+growth-1
-          //check Pheno coordinates range
-          if (Point(1)-growth>=1)&(check_room>=1)&(check_room<=y_span+2)
-            //セルにその部屋の番号があってかつ進行方向のセルが空いていることを確かめる
-            if (Pheno(Point(1)-growth+1,check_room,individual_num)==room_num)..
-            &(Pheno(Point(1)-growth,check_room,individual_num)~=0)
-              Direction_flag(room_num,1)=1;
-            end //if 
-          end //if
-        end //for check_room
-        //fill cells with room_mun start
-        if Direction_flag(room_num,1)==0
-          for check_room=Point(2)-growth+1:Point(2)+growth-1
-            if (Point(1)-growth>=1)&(check_room>=1)&(check_room<=y_span+2)
-              if Pheno(Point(1)-growth+1,check_room,individual_num)==room_num
-                Pheno(Point(1)-growth,check_room,individual_num)=room_num;
-              end //if
-            end //if
-          end //for check_room
-        end // if Direction_flag
-        //fill cells with room_num end        
-      end //if Direction_flag
-      //North end
-      
-      //East start
-      if Direction_flag(room_num,2)==0
-        for check_room=Point(1)-growth+1:Point(1)+growth-1
-          if (check_room>=1)&(check_room<=x_span+2)&(Point(2)+growth<=y_span+2)
-            if (Pheno(check_room,Point(2)+growth-1,individual_num)==room_num)..
-            &(Pheno(check_room,Point(2)+growth,individual_num)~=0)
-              Direction_flag(room_num,2)=1;
-            end //if
-          end //if
-        end //for check_room
-        //fill cells with room_mun start
-        if Direction_flag(room_num,2)==0
-          for check_room=Point(1)-growth+1:Point(1)+growth-1
-            if (check_room>=1)&(check_room<=x_span+2)&(Point(2)+growth<=y_span+2)
-              if Pheno(check_room,Point(2)+growth-1,individual_num)==room_num
-                Pheno(check_room,Point(2)+growth,individual_num)=room_num;
-              end //if
-            end //if
-          end //for check_room
-        end // if Direction_flag
-        //fill cells with room_num end
-      end //if
-      //East end
-      
-      //South start
-      if Direction_flag(room_num,3)==0
-        for check_room=Point(2)-growth+1:Point(2)+growth-1
-          if (check_room>=1)&(check_room<=y_span+2)&(Point(1)+growth<=x_span+2)
-            if (Pheno(Point(1)+growth-1,check_room,individual_num)==room_num)..
-            &(Pheno(Point(1)+growth,check_room,individual_num)~=0)
-              Direction_flag(room_num,3)=1;
-            end //if
-          end // if
-        end //for check_room
-        //fill cells with room_mun start
-        if Direction_flag(room_num,3)==0
-          for check_room=Point(2)-growth+1:Point(2)+growth-1
-            if (check_room>=1)&(check_room<=y_span+2)&(Point(1)+growth<=x_span+2)
-              if Pheno(Point(1)+growth-1,check_room,individual_num)==room_num
-                Pheno(Point(1)+growth,check_room,individual_num)=room_num;
-              end //if
-            end //if
-          end //for check_room
-        end //if Direction_flag
-        //fill cells with room_num end
-      end //if
-      //South end
-      
-      //West start
-      if Direction_flag(room_num,4)==0
-        for check_room=Point(1)-growth+1:Point(1)+growth-1
-          if (check_room>=1)&(check_room<=x_span+2)&(Point(2)-growth>=1)
-            if (Pheno(check_room,Point(2)-growth+1,individual_num)==room_num)..
-            &(Pheno(check_room,Point(2)-growth,individual_num)~=0)
-              Direction_flag(room_num,4)=1;
-            end //if
-          end //if
-        end //for check_room
-        //fill cells with room_mun start
-        if Direction_flag(room_num,4)==0
-          for check_room=Point(1)-growth+1:Point(1)+growth-1
-            if (check_room>=1)&(check_room<=x_span+2)&(Point(2)-growth>=1)
-              if Pheno(check_room,Point(2)-growth+1,individual_num)==room_num
-                Pheno(check_room,Point(2)-growth,individual_num)=room_num;
-              end //if
-            end //if
-          end //for check_room
-        end //if Direction_flag
-        //fill cells with room_num end
-      end //if
-      //west end
-      
-      //NE corner start
-      if(Point(1)-growth>=1)&(Point(2)+growth<=y_span+2)
-        if (Pheno(Point(1)-growth,Point(2)+growth-1,individual_num)==room_num)..
-        &(Pheno(Point(1)-growth+1,Point(2)+growth,individual_num)==room_num)..
-        &(Pheno(Point(1)-growth,Point(2)+growth,individual_num)==0)
-          Pheno(Point(1)-growth,Point(2)+growth,individual_num)=room_num;
-        end
-      end
-      //NE corner end
-      
-      //SE corner start
-      if(Point(1)+growth<=x_span+2)&(Point(2)+growth<=y_span+2)
-        if (Pheno(Point(1)+growth-1,Point(2)+growth,individual_num)==room_num)..
-        &(Pheno(Point(1)+growth,Point(2)+growth-1,individual_num)==room_num)..
-        &(Pheno(Point(1)+growth,Point(2)+growth,individual_num)==0)
-          Pheno(Point(1)+growth,Point(2)+growth,individual_num)=room_num;
-        end
-      end      
-      //SE corner end
-      
-      //SW corner start
-      if(Point(1)+growth<=x_span+2)&(Point(2)-growth>=1)
-        if (Pheno(Point(1)+growth,Point(2)-growth+1,individual_num)==room_num)..
-        &(Pheno(Point(1)+growth-1,Point(2)-growth,individual_num)==room_num)..
-        &(Pheno(Point(1)+growth,Point(2)-growth,individual_num)==0)
-          Pheno(Point(1)+growth,Point(2)-growth,individual_num)=room_num;
-        end
-      end
-      //SW corner end
-      
-      //NW corner start
-      if(Point(1)-growth>=1)&(Point(2)-growth>=1)
-        if (Pheno(Point(1)-growth+1,Point(2)-growth,individual_num)==room_num)..
-        &(Pheno(Point(1)-growth,Point(2)-growth+1,individual_num)==room_num)..
-        &(Pheno(Point(1)-growth,Point(2)-growth,individual_num)==0)
-          Pheno(Point(1)-growth,Point(2)-growth,individual_num)=room_num;
-        end
-      end
-      //NW corner end
-      
-    end // for room_num
-  end //for growth
-end //for individual_num
+  while end_flag==0
+    Direction_flag=zeros(rooms,4); // 部屋、方向ごとに成長するかを判断するフラグ
+    room_flag=zeros(rooms); // 部屋単位で成長できるかを判断するフラグ(Direction_flagが一つでも立てばこれも立つ)
+    select_prob=zeros(rooms,individuals); // 選択確率計算に必要
+    room_available=zeros(rooms,individuals); // 選択確率計算に必要
 
+    for room_num=1:rooms
+      //Point means coordinate of seed
+      Point=Geno(room_num,1:2,individual_num);
+      //there is overlap problem on next line
+      Pheno(Point(1),Point(2),individual_num)=room_num;
+      for direction_num=1:4
+        //種から各方向のエリア端までの距離(seed_distance)を計算
+        //North
+        while 1
+          if Point(1)-seed_distance(1)>=1 // エリアをはみ出さないかチェック
+            if Pheno(Point(1)-seed_distance(1),Point(2),individual_num)==room_num // 部屋のエリア内であればseed_distanceを加算していく
+              seed_distance(1)=seed_distance(1)+1;
+            else //debug: elseがうまく対応していないかも（自動インデントがおかしかった．単にeditorの問題？）
+              break;
+            end //if
+          else //if エリアをはみ出す
+            break;
+          end//if
+        end //North
+        //East
+        while 1
+          if Point(2)+seed_distance(2)<=y_span // エリアをはみ出さないかチェック
+            if Pheno(Point(1),Point(2)+seed_distance(2),individual_num)==room_num // 部屋のエリア内であればseed_distanceを加算していく
+              seed_distance(2)=seed_distance(2)+1;
+            else //debug: elseがうまく対応していないかも（自動インデントがおかしかった．単にeditorの問題？）
+              break;
+            end // if
+          else //if エリアをはみ出す
+            break;
+          end//if
+        end //East
+        //South
+        while 1
+          if Point(1)+seed_distance(3)<=x_span// エリアをはみ出さないかチェック
+            if Pheno(Point(1)+seed_distance(3),Point(2),individual_num)==room_num // 部屋のエリア内であればseed_distanceを加算していく
+              seed_distance(3)=seed_distance(3)+1;
+            else //debug: (（自動インデントがおかしかった．単にeditorの問題？）
+              break;
+            end //if
+          else //if エリアをはみ出す
+            break;
+          end//if
+        end //South
+        //West
+        while 1
+          if Point(2)-seed_distance(4)>=1// エリアをはみ出さないかチェック
+            if Pheno(Point(1),Point(2)-seed_distance(4),individual_num)==room_num // 部屋のエリア内であればseed_distanceを加算していく
+              seed_distance(4)=seed_distance(4)+1;
+            else //debug: elseがうまく対応していないかも（自動インデントがおかしかった．単にeditorの問題？）
+              break;
+            end //if
+          else //if エリアをはみ出す
+            break;
+          end//if
+        end //West
+      
+        //成長可能エリアを計算
+        count=1;
+        //North
+        while 1
+          for unit=Point(2)-seed_distance(4):Point(2)+seed_distance(2) // 成長と垂直方向、範囲をはみ出すことはないはず
+            if Point(1)-seed_distance(1)-count>=1 // 成長方向、エリアはみ出さない（成長方向）なら
+              if Pheno(Point(1)-seed_distance(1)-count,unit,individual_num)~=0
+                break;break;
+              end
+            else
+              break;break;
+            end
+          end //for
+          growth_area=growth_area+(seed_distance(4)+seed_distance(2)+1); // 一片の長さ、+1=種のセル
+          count=count+1;
+        end //North
+        //East
+        count=1;
+        while 1
+          for unit=Point(1)-seed_distance(1):Point(1)+seed_distance(3)// 成長と垂直方向、範囲をはみ出すことはないはず
+            if Point(2)+seed_distance(2)+count<=y_span // エリアはみ出さない（成長方向）なら
+              if Pheno(unit,Point(2)+seed_distance(2)+count,individual_num)~=0
+                break;break;
+              end
+            else
+              break;break;
+            end
+          end //for
+          growth_area=growth_area+(seed_distance(1)+seed_distance(3)+1); // 一片の長さ、+1=種のセル
+          count=count+1;
+        end //East
+        //South
+        count=1;
+        while 1
+          for unit=Point(2)-seed_distance(4):Point(2)+seed_distance(2)// 成長と垂直方向、範囲をはみ出すことはないはず
+            if Point(1)+seed_distance(3)+count<=x_span // エリアはみ出さない（成長方向）なら
+              if Pheno(Point(1)+seed_distance(3)+count,unit,individual_num)~=0
+                break;break;
+              end
+            else
+              break;break;
+            end
+          end //for
+          growth_area=growth_area+(seed_distance(4)+seed_distance(2)+1); // 一片の長さ、+1=種のセル
+          count=count+1;
+        end //South
+        //West
+        count=1;
+        while 1
+          for unit=Point(1)-seed_distance(1):Point(1)+seed_distance(3)// 成長と垂直方向、範囲をはみ出すことはないはず
+            if Point(2)-seed_distance(4)-count>=1 // エリアはみ出さない（成長方向）なら
+              if Pheno(unit,Point(2)-seed_distance(4)-count,individual_num)~=0
+                break;break;
+              end
+            else
+              break;break;
+            end
+          end //for
+          growth_area=growth_area+(seed_distance(1)+seed_distance(3)+1); // 一片の長さ、+1=種のセル
+          count=count+1;
+        end //West
+      end //direction_num
+    end //room_num
+    
+    // 成長できる部屋、方向にフラグを立てる
+    for room_num=1:rooms
+      for direction_num=1:4
+        if (growth_area(room_num,direction_num,individual_num)~=0) & (Direction_flag(room_num,direction_num)==0)
+          Direction_flag(room_num,direction_num)=1;
+          room_flag(room_num)=1; //debug: overloadの問題
+        end //if
+      end //direction_num
+    end //room_num
+
+    //選択確率計算
+    for room_num=1:rooms // 成長できない部屋を除外
+      if room_flag(room_num)==1
+        room_available(room_num,individual_num) = Desirable_area(room_num);
+      end//if
+    end
+    for room_num=1:rooms // 選択確率を計算
+      select_prob(room_num,individual_num) = (room_available(room_num,individual_num)/sum(room_available))+select_prob(room_num,individual_num);
+    end
+  
+    //選択
+    rand_num=rand();//0~1の一様分布乱数
+    for room_num=1:rooms
+      if rand_num<=select_prob(room_num)
+        select_num=room_num;
+      else
+        break
+      end
+    end
+
+    //成長
+    room_num=select_num
+    //North
+    if Direction_flag(room_num,1)==1
+      for unit=Point(2)-seed_distance(4):Point(2)+seed_distance(2)
+        Pheno(Point(1)-seed_distance(1),unit,individual_num)=room_num;
+      end
+    end // if Direction_flag
+    //East
+    if Direction_flag(room_num,2)==1
+      for unit=Point(1)-seed_distance(1):Point(1)+seed_distance(3)
+        Pheno(unit,Point(2)+seed_distance(2),individual_num)=room_num;
+      end
+    end // if Direction_flag
+    //South
+    if Direction_flag(room_num,3)==1
+      for unit=Point(2)-seed_distance(4):Point(2)+seed_distance(2)
+        Pheno(Point(1)+seed_distance(3),unit,individual_num)=room_num;
+      end
+    end // if Direction_flag
+    //West
+    if Direction_flag(room_num,4)==1
+      for unit=Point(1)-seed_distance(1):Point(1)+seed_distance(3)
+        Pheno(unit,Point(2)-seed_distance(4),individual_num)=room_num;
+      end
+    end // if Direction_flag
+    //North Eeast
+    if Direction_flag(room_num,1)==1 & Direction_flag(room_num,2)==1
+      Pheno(Point(1)-seed_distance(1)-1,Point(2)+seed_distance(2)+1,individual_num)=room_num;
+    end
+    //South Eeast
+    if Direction_flag(room_num,3)==1 & Direction_flag(room_num,2)==1
+      Pheno(Point(1)+seed_distance(3)+1,Point(2)+seed_distance(2)+1,individual_num)=room_num;
+    end
+    //South West
+    if Direction_flag(room_num,3)==1 & Direction_flag(room_num,4)==1
+      Pheno(Point(1)+seed_distance(3)+1,Point(2)-seed_distance(4)-1,individual_num)=room_num;
+    end
+    //North West
+    if Direction_flag(room_num,1)==1 & Direction_flag(room_num,4)==1
+      Pheno(Point(1)-seed_distance(1)-1,Point(2)-seed_distance(4)-1,individual_num)=room_num;
+    end  
+    //終了判定
+    end_flag=1;
+    for room_num=1:rooms
+      if room_flag(room_num)~=0
+        end_flag=0;
+      end
+    end
+  end //while
+end //individual_num
 
 // 0(void space)->11(void space)
 for individual_num=1:individuals
@@ -187,5 +246,15 @@ for individual_num=1:individuals
   end
 end
 
+// 0(void space)->11(void space)
+for individual_num=1:individuals
+  for y=2:y_span+1
+    for x=2:x_span+1
+      if Pheno(x,y,individual_num)==0
+        Pheno(x,y,individual_num)=11;
+      end
+    end
+  end
+end
 
 endfunction
