@@ -17,7 +17,7 @@ exec schedule.sci
 //グローバル変数
 global x_span y_span rooms individuals Geno Pheno objectives Objective Pareto ..
 generations generation_num Pair GenoBinary children ChildBinary Child mutationRate ..
-sigma_share exponent_share sample_num
+sigma_share exponent_share sample_num Desirable_area
 
 //定数設定
 x_span=7+5;//span to x-direction
@@ -32,6 +32,8 @@ exponent_share=1; //
 children=individuals; //1世代で作る子供の数(親と子供を総入替えするので同じ数にした)
 Geno=zeros(rooms,2,individuals); //ゲノタイプ（遺伝子型）
 Objective=zeros(individuals,objectives,generations,samples);
+Desirable_area=[20,16,12,12,12,9,1];//LR,DK,BR1,BR2,BR3,WA,Path
+
 //個体・目的・世代・サンプル数ごとの評価値
 mutationRate=0.01; //突然変異率0～1
 

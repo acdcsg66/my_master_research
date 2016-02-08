@@ -6,7 +6,6 @@ global individuals objectives Objective Pareto generation_num sample_num Schedul
 Pareto=ones(1,individuals);
 win_flag=0;
 ovarlap_flag=1; //Objective‚Ì’l‚ª‘S‚Ä“¯‚¶ê‡‚Í1
-pause;
 for i=1:individuals //”äŠrå‘Ì‚ÌŒÂ‘Ì”Ô†
   for j=1:individuals //”äŠr‘Šè‚ÌŒÂ‘Ì”Ô† 
     if i~=j //©•ª©g‚Æ‚Ì”äŠr‚ğ”ğ‚¯‚é
