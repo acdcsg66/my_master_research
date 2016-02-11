@@ -1,5 +1,7 @@
 function growPheno
 
+// 2016/02/11 部屋を目標面積に比例して選択＆成長させる、成長の方向は成長可能なエリアが最小or最大な方へ
+
 global individuals rooms x_span y_span rooms Geno Pheno Desirable_area
 //select_prob room_available seed_distance growth_area seed_distance ..
 //end_flag common_flag  Direction_flag room_flag count
@@ -241,32 +243,21 @@ for individual_num=1:individuals
 //        end
 //      end
 //pause
-      //方向選択
-      dir_sum=0;
-      for dir_num=1:4
-        if Direction_flag(select_room,dir_num,individual_num)~=0
-          dir_sum=Direction_flag(select_room,dir_num,individual_num)/sum(Direction_flag(select_room,1:4,individual_num))+dir_sum;
-          dir_prob(dir_num,individual_num) = dir_sum;
-        else
-          dir_prob(dir_num,individual_num) = 0;
-        end
-      end
+
+      //方向選択 成長エリアが最大or最小を選択。
+      //最大、仕様で部屋番号＝添え字だけでなく部屋の大きさも代入しないといけないみたい
+      //[dir_size,select_dir]=maxi(growth_area(select_room,1:4,individual_num));
+
+      //最小、ゼロを除外しないとダメなので個別に
       select_dir=0;
-      rand_num=rand();//0~1の一様分布乱数
-      dir_num=1;
-      while select_dir==0
-        if rand_num<=dir_prob(dir_num,individual_num)// & dir_prob(dir_num,individual_num)~=0
-          select_dir=dir_num;
-        else
-          dir_num=dir_num+1;
+      min_growth=100000; //適当に大きな数
+      for dir_count=1:4
+        if growth_area(select_room,dir_count,individual_num)~=0 ..
+        & growth_area(select_room,dir_count,individual_num) < min_growth
+          select_dir=dir_count;
         end
       end
-//      for dir_num=1:4
-//        if rand_num>=dir_prob(dir_num,individual_num) & dir_prob(dir_num,individual_num)~=0
-//          select_dir=dir_num;
-//        end
-//      end
-//pause
+
       //成長      
       //North
       if Direction_flag(select_room,1,individual_num)==1 & select_dir==1
@@ -342,5 +333,17 @@ for individual_num=1:individuals
     end
   end
 end
+
+//それぞれの部屋の面積を数える(debug用)
+room_size_count=zeros(11,individuals);
+for individual_num=1:individuals
+  for y=2:y_span+1
+    for x=2:x_span+1
+     room_size_count(Pheno(x,y,individual_num),individual_num)=room_size_count(Pheno(x,y,individual_num),individual_num)+1;
+    end
+  end
+end
+pause
+
 
 endfunction
