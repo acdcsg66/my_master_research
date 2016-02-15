@@ -47,11 +47,11 @@ for sample_num=1:samples
     growPheno();
     //IEC(Display&Evaluate)
     //↓描画 前はxset()があった．そっちを使うべきかも
-    //clf();
-    //for individual_num=1:individuals
-    //  subplot(3,7,individual_num);
-    //  Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
-    //end
+    clf();
+    for individual_num=1:individuals
+      subplot(3,7,individual_num);
+      Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
+    end
     evaluate();
     pseudoEvaluate();
     pareto();
@@ -60,10 +60,10 @@ for sample_num=1:samples
     geneManipulate(); 
   end //for generation_num
 //debug: 場所を上部に変更した
-  for individual_num=1:individuals
-    subplot(3,7,individual_num);
-    Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
-  end
+//  for individual_num=1:individuals
+//    subplot(3,7,individual_num);
+//    Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
+//  end
 end //for sample_num
 ///////////////////////////////////////////////////////////////////////////////
 //getdate()
