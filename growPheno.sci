@@ -1,6 +1,6 @@
 function growPheno
   
-// 2016/02/17 （目標面積－現在面積）により部屋の選択確率を決定（方向は成長できる4方向すべて＋斜め方向、成長速度を可変に　例：左が成長できないなら右を2倍成長させる）
+// 2016/02/17 （目標面積－現在面積）により部屋の選択確率を決定（方向は成長できる2方向すべて＋斜め方向、成長速度を可変に　例：左が成長できないなら右を2倍成長させる）
 
 global individuals rooms x_span y_span rooms Geno Pheno Desirable_area
 //room_prob room_available seed_distance growth_area seed_distance ..
@@ -425,47 +425,38 @@ for individual_num=1:individuals
         end
       end
 
-      //方向ごとに成長数決定
-      grow=4;
-      // まずはじめに成長できる方向に1回ずつ成長を配分
-      //上
+      //成長数決定
+      grow=2;
+      //正方形を優先（左が成長できないなら右、上が成長できないなら下、もしくはそれぞれの逆）→無理なら候補からrandom、max、min
+      //上が成長できるなら成長を割り当て
       if growth_count(select_room,1)>=1
         growth_num(1,1)=1;
         grow=grow-1;
       end
+      //右が成長できるなら成長を割り当て
       if growth_count(select_room,2)>=1
         growth_num(1,2)=1;
         grow=grow-1;
       end
+      //下が成長できるなら50%の確率で上と入れ替え、下が成長できる　かつ　上が成長してないなら100%の確率で下に成長割り当て
       if growth_count(select_room,3)>=1
-        growth_num(1,3)=1;
-        grow=grow-1;
+        if growth_num(1,1)==1 & rand()>0.5
+          growth_num(1,1)=0;
+          growth_num(1,3)=1;
+        elseif growth_num(1,1)==0
+          growth_num(1,3)=1;
+          grow=grow-1;
+        end
       end
+      //右が成長できるなら50%の確率で左と入れ替え、右が成長できる　かつ　左が成長してないなら100%の確率で右に成長割り当て
       if growth_count(select_room,4)>=1
-        growth_num(1,4)=1;
-        grow=grow-1;
-      end
-      //残ったgrowが自由に成長可能数を割り振れるパラメータ、正方形を優先（左が成長できないなら右、上が成長できないなら下、もしくはそれぞれの逆）→無理なら候補からrandom、max、min
-      //正方形
-      //下が成長できないなら上
-      if growth_count(select_room,1)>=2 & growth_count(select_room,3)==0
-        growth_num(1,1)=growth_num(1,1)+1;
-        grow=grow-1;
-      end
-      //左が成長できないなら右
-      if growth_count(select_room,2)>=2 & growth_count(select_room,4)==0
-        growth_num(1,2)=growth_num(1,2)+1;
-        grow=grow-1;
-      end
-      //上が成長できないなら下
-      if growth_count(select_room,3)>=2 & growth_count(select_room,1)==0
-        growth_num(1,3)=growth_num(1,3)+1;
-        grow=grow-1;
-      end
-      //右が成長できないなら左
-      if growth_count(select_room,4)>=2 & growth_count(select_room,2)==0
-        growth_num(1,4)=growth_num(1,4)+1;
-        grow=grow-1;
+        if growth_num(1,2)==1 & rand()>0.5
+          growth_num(1,2)=0;
+          growth_num(1,4)=1;          
+        elseif growth_num(1,2)==0
+          growth_num(1,4)=1;
+          grow=grow-1;
+        end
       end
 //pause
       
