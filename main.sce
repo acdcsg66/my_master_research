@@ -24,8 +24,8 @@ x_span=7+5;//span to x-direction
 y_span=7;//span to y-direction
 rooms=7;//number of room-type
 objectives=4;//Area,Proportion,Circulation,Sunlight,InnerWall,Pipe,IEC
-generations=50;//世代数
-samples=50;//サンプル数は2以上にしないと行列の都合でエラーが出る？
+generations=30;//世代数
+samples=30;//サンプル数は2以上にしないと行列の都合でエラーが出る？
 individuals=21; //個体数
 sigma_share=49/4; //0<シェアリング(半径)<=(x_span*y_span)
 exponent_share=1; //
@@ -46,49 +46,43 @@ for sample_num=1:samples
   for generation_num=1:generations
     growPheno();
     //IEC(Display&Evaluate)
-    //↓描画 前はxset()があった．そっちを使うべきかも
-    clf();
-    for individual_num=1:individuals
-      subplot(3,7,individual_num);
-      Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
-    end
+    //xset("wpdim",700,300)
     evaluate();
     pseudoEvaluate();
     pareto();
-    //Objective(:,:,generation_num,sample_num) //evaluate()内で計算しているっぽい
+    //Objective(:,:,generation_num,sample_num)
     selectPair();
     geneManipulate(); 
   end //for generation_num
-//debug: 場所を上部に変更した
-//  for individual_num=1:individuals
-//    subplot(3,7,individual_num);
-//    Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
-//  end
+  for individual_num=1:individuals
+    subplot(3,7,individual_num);
+    Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
+  end
 end //for sample_num
 ///////////////////////////////////////////////////////////////////////////////
-//getdate()
+getdate()
 
 
 //4目的のグラフ
-//ObjectiveMean=zeros(generations,4);
-//for generation_num=1:generations
-//  for objective_num=1:4
-//    ObjectiveMean(generation_num,objective_num)=..
-//    mean(Objective(:,objective_num,generation_num,:));
-//  end
-//end
-//scf(); //Open New Figure
-//xgrid();
-//plot2d(1:generations,ObjectiveMean,rect=[0,0.5,generations,1],style=[1,1,1,1,1,1,1]);
-//A=gca();
-//P=A.children.children;
-//P(4).line_style=1; P(4).thickness=2;
-//P(3).line_style=2; P(3).thickness=2;
-//P(2).line_style=3; P(2).thickness=2;
-//P(1).line_style=4; P(1).thickness=2;
-//xtitle('4 Objectives','Generation','Fitness');
-//debug: legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting',4); 
-//legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting','in_lower_right');
+ObjectiveMean=zeros(generations,4);
+for generation_num=1:generations
+    for objective_num=1:4
+      ObjectiveMean(generation_num,objective_num)=..
+      mean(Objective(:,objective_num,generation_num,:));
+    end
+end
+scf(); //Open New Figure
+xgrid();
+plot2d(1:generations,ObjectiveMean,rect=[0,0.5,generations,1],style=[1,1,1,1,1,1,1]);
+A=gca();
+P=A.children.children;
+P(4).line_style=1; P(4).thickness=2;
+P(3).line_style=2; P(3).thickness=2;
+P(2).line_style=3; P(2).thickness=2;
+P(1).line_style=4; P(1).thickness=2;
+xtitle('4 Objectives','Generation','Fitness');
+legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting',4); 
+
 
 //6目的のグラフ
 //ObjectiveMean=zeros(generations,6);
@@ -98,7 +92,6 @@ end //for sample_num
 //      mean(Objective(:,objective_num,generation_num,:));
 //    end
 //end
-//ObjectiveMean
 //scf(); //Open New Figure
 //xgrid();
 //plot2d(1:generations,ObjectiveMean,rect=[0,0,generations,1],style=[1,1,1,1,1,1,1]);
@@ -112,10 +105,9 @@ end //for sample_num
 //P(1).line_style=6; P(1).thickness=2;
 ////P(7).line_style=6; P(7).thickness=2;
 //xtitle('6 Objectives','Generation','Fitness');
-//debug: legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting','Obj5 Wall','Obj6 Duct',4);
-//legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting','Obj5 Wall','Obj6 Duct','in_lower_right');
+//legend('Obj1 Area Size','Obj2 Proportion','Obj3 Circulation','Obj4 Sunlighting','Obj5 Wall','Obj6 Duct',4);
 
 
 beep
 
-//save('Objective.dat',Objective)
+save('Objective.dat',Objective)

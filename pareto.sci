@@ -20,11 +20,9 @@ for i=1:individuals //比較主体の個体番号
           end //if Objective
         end // if Schedule
       end // for objective_num
-      //debug: if win_flag==0 & ovarlap_flag==0 //>=の時はovarlap_flagは不要？
-      if win_flag==1 & ovarlap_flag==0 //>=の時はovarlap_flagは不要？
+      if win_flag==0 & ovarlap_flag==0 //>=の時はovarlap_flagは不要？
       //if すべての目的関数について勝ってはいない & Objectiveの値に違いがある
-        //Pareto(1,i)=Pareto(1,i)+1; //Pareto Rankを一つ下げる //debug: 上げている？
-        Pareto(1,i)=Pareto(1,i)-1; //Pareto Rankを一つ下げる //debug: 上げている？
+        Pareto(1,i)=Pareto(1,i)+1; //Pareto Rankを一つ下げる
       end // if
       win_flag=0; //reset flag
       ovarlap_flag=1; //reset flag

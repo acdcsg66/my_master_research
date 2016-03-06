@@ -23,7 +23,7 @@ end
 //score
 for individual_num=1:individuals
   for room_num=1:rooms
-    //~-10%
+    //0~-10%
     if Area(room_num,1,individual_num)<Desirable_area(room_num)*0.90
       Area(room_num,2,individual_num)=..
       Area(room_num,1,individual_num)/(Desirable_area(room_num)*0.90);
