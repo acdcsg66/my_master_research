@@ -423,85 +423,174 @@ for individual_num=1:individuals
       end
 
       //成長数決定
+      grow=2;
       //正方形を優先（左が成長できないなら右、上が成長できないなら下、もしくはそれぞれの逆）手法はrandom、max、minのどれか→無理なら候補から更にrandom、max、min（手法変更で2箇所変更）
       //最大
       //上が成長できるなら成長を割り当て
-      //if growth_count(select_room,1)-growth_num(1,1) >=1
-      //  growth_num(1,1)=1;
-      //end
-      //右が成長できるなら成長を割り当て
-      //if growth_count(select_room,2)-growth_num(1,2) >= 1
-      //  growth_num(1,2)=1;
-      //end
-      //下が上より成長できるなら上と入れ替え
-      //if growth_count(select_room,3)*(seed_distance(select_room,3,2,individual_num)+seed_distance(select_room,3,3,individual_num)+1) ..
-      //>= growth_count(select_room,1)*(seed_distance(select_room,1,2,individual_num)+seed_distance(select_room,1,3,individual_num)+1) ..
-      //& growth_count(select_room,3)-growth_num(1,3) >= 1
-      //  growth_num(1,1)=0;
-      //  growth_num(1,3)=1;
-      //end
-      //左が右より成長できるなら右と入れ替え
-      //if growth_count(select_room,4)*(seed_distance(select_room,4,2,individual_num)+seed_distance(select_room,4,3,individual_num)+1) ..
-      //>= growth_count(select_room,2)*(seed_distance(select_room,2,2,individual_num)+seed_distance(select_room,2,3,individual_num)+1) ..
-      //& growth_count(select_room,4)-growth_num(1,4) >= 1
-      //  growth_num(1,2)=0;
-      //  growth_num(1,4)=1;
-      //end
-
-      //最小
-      //上が成長できるなら成長を割り当て
       if growth_count(select_room,1)-growth_num(1,1) >=1
         growth_num(1,1)=1;
+        grow=grow-1;
       end
       //右が成長できるなら成長を割り当て
       if growth_count(select_room,2)-growth_num(1,2) >= 1
         growth_num(1,2)=1;
+        grow=grow-1;
       end
+      //下が上より成長できるなら上と入れ替え
+      if (growth_count(select_room,3)-growth_num(1,3))*(seed_distance(select_room,3,2,individual_num)+seed_distance(select_room,3,3,individual_num)+1) ..
+      >= (growth_count(select_room,1)-growth_num(1,1))*(seed_distance(select_room,1,2,individual_num)+seed_distance(select_room,1,3,individual_num)+1) ..
+      & growth_count(select_room,3)-growth_num(1,3)>= 1
+        if growth_num(1,1)==1
+          growth_num(1,1)=0;
+          growth_num(1,3)=1;
+        elseif growth_num(1,1)==0
+          growth_num(1,3)=1;
+          grow=grow-1;
+        end
+      end
+      //左が右より成長できるなら右と入れ替え
+      if (growth_count(select_room,4)-growth_num(1,4))*(seed_distance(select_room,4,2,individual_num)+seed_distance(select_room,4,3,individual_num)+1) ..
+      >= (growth_count(select_room,2)-growth_num(1,2))*(seed_distance(select_room,2,2,individual_num)+seed_distance(select_room,2,3,individual_num)+1) ..
+      & growth_count(select_room,4)-growth_num(1,4)>= 1
+        if growth_num(1,2)==1
+          growth_num(1,2)=0;
+          growth_num(1,4)=1;
+        elseif growth_num(1,2)==0
+          growth_num(1,4)=1;
+          grow=grow-1;
+        end
+      end
+    
+      //最小 debug: 上右が成長できないときに下左成長できるように
+      //上が成長できるなら成長を割り当て
+      //if growth_count(select_room,1)-growth_num(1,1) >=1
+      //  growth_num(1,1)=1;
+      //  grow=grow-1;
+      //end
+      //右が成長できるなら成長を割り当て
+      //if growth_count(select_room,2)-growth_num(1,2) >= 1
+      //  growth_num(1,2)=1;
+      //  grow=grow-1;
+      //end
       //上が下より成長できるなら下と入れ替え
-      if (growth_count(select_room,3)*(seed_distance(select_room,3,2,individual_num)+seed_distance(select_room,3,3,individual_num)+1) ..
-      <= growth_count(select_room,1)*(seed_distance(select_room,1,2,individual_num)+seed_distance(select_room,1,3,individual_num)+1) ..
-      | growth_count(select_room,1) == 0) ..
-      & growth_count(select_room,3) >= 1
-        growth_num(1,1)=0;
-        growth_num(1,3)=1;
-      end
+      //if (growth_count(select_room,3)-growth_num(1,3))*(seed_distance(select_room,3,2,individual_num)+seed_distance(select_room,3,3,individual_num)+1) ..
+      //<= (growth_count(select_room,1)-growth_num(1,1))*(seed_distance(select_room,1,2,individual_num)+seed_distance(select_room,1,3,individual_num)+1) ..
+      //& growth_count(select_room,3)-growth_num(1,3)>= 1
+      //  if growth_num(1,1)==1
+      //    growth_num(1,1)=0;
+      //    growth_num(1,3)=1;
+      //  elseif growth_num(1,1)==0
+      //    growth_num(1,3)=1;
+      //    grow=grow-1;
+      //  end
+      //end
       //右が左より成長できるなら右と入れ替え
-      if (growth_count(select_room,4)*(seed_distance(select_room,4,2,individual_num)+seed_distance(select_room,4,3,individual_num)+1) ..
-      <= growth_count(select_room,2)*(seed_distance(select_room,2,2,individual_num)+seed_distance(select_room,2,3,individual_num)+1) ..
-      | growth_count(select_room,2) == 0) ..
-      & growth_count(select_room,4) >= 1
-        growth_num(1,2)=0;
-        growth_num(1,4)=1;
-      end
+      //if (growth_count(select_room,4)-growth_num(1,4))*(seed_distance(select_room,4,2,individual_num)+seed_distance(select_room,4,3,individual_num)+1) ..
+      //<= (growth_count(select_room,2)-growth_num(1,2))*(seed_distance(select_room,2,2,individual_num)+seed_distance(select_room,2,3,individual_num)+1) ..
+      //& growth_count(select_room,4)-growth_num(1,4)>= 1
+      //  if growth_num(1,2)==1
+      //    growth_num(1,2)=0;
+      //    growth_num(1,4)=1;
+      //  elseif growth_num(1,2)==0
+      //    growth_num(1,4)=1;
+      //    grow=grow-1;
+      //  end
+      //end
 
       //ランダム
       //上が成長できるなら成長を割り当て
       //if growth_count(select_room,1)>=1
       //  growth_num(1,1)=1;
+      //  grow=grow-1;
       //end
       //右が成長できるなら成長を割り当て
       //if growth_count(select_room,2)>=1
       //  growth_num(1,2)=1;
+      //  grow=grow-1;
       //end
       //下が成長できるなら50%の確率で上と入れ替え、下が成長できる　かつ　上が成長してないなら100%の確率で下に成長割り当て
       //if growth_count(select_room,3)>=1
-      //  if growth_count(select_room,1) == 0
-      //    growth_num(1,3)=1;
-      //  elseif rand() > 0.5
+      //  if growth_num(1,1)==1 & rand()>0.5
       //    growth_num(1,1)=0;
       //    growth_num(1,3)=1;
+      //  elseif growth_num(1,1)==0
+      //    growth_num(1,3)=1;
+      //    grow=grow-1;
       //  end
       //end
       //右が成長できるなら50%の確率で左と入れ替え、右が成長できる　かつ　左が成長してないなら100%の確率で右に成長割り当て
       //if growth_count(select_room,4)>=1
-      // if growth_count(select_room,2) == 0
-      //    growth_num(1,4)=1;
-      //  elseif rand() > 0.5
+      //  if growth_num(1,2)==1 & rand()>0.5
       //    growth_num(1,2)=0;
+      //    growth_num(1,4)=1;          
+      //  elseif growth_num(1,2)==0
       //    growth_num(1,4)=1;
+      //    grow=grow-1;
       //  end
       //end      
-      
+      //dir_factor(1,1:4)=0;//方向をランダム選択するときに使用。4方向についてまだ成長できるなら1、できないなら0。成長方向が決まるたびに更新
+      //for dir_count=1:4
+      //  if growth_count(select_room,dir_count)-growth_num(1,dir_count)>0
+      //    dir_factor(1,dir_count)=1;
+      //  end
+      //end
+
+      // 成長を完全に配分し終わっていない　かつ　まだ成長できる方向がある　かつ　（A群で目標面積を超えていない　または　B群で目標面積を超えている）　間、ループ
+      while grow>=1 & (growth_count(select_room,1)-growth_num(1,1)>0 | growth_count(select_room,2)-growth_num(1,2)>0 ..
+      | growth_count(select_room,3)-growth_num(1,3)>0 | growth_count(select_room,4)-growth_num(1,4)>0)
+        //成長可能エリア最大の方向を選ぶ
+        select_dir=0;
+        max_growth=0;
+        for dir_count=1:4
+          if growth_count(select_room,dir_count)-growth_num(1,dir_count)>0 .. // 成長可能かチェック＆現時点の成長可能面積が最大の方向を選択
+          & (growth_count(select_room,dir_count)-growth_num(1,dir_count))*(seed_distance(select_room,dir_count,2,individual_num)+seed_distance(select_room,dir_count,3,individual_num)+1) > max_growth
+            max_growth=(growth_count(select_room,dir_count)-growth_num(1,dir_count))*(seed_distance(select_room,dir_count,2,individual_num)+seed_distance(select_room,dir_count,3,individual_num)+1);
+            select_dir=dir_count;
+          end
+        end
+        growth_num(1,select_dir)=growth_num(1,select_dir)+1;
+        grow=grow-1;
+
+        //最小、成長可能エリアがゼロの方向を除外
+        //select_dir=0;
+        //min_growth=100000; //適当に大きな数
+        //for dir_count=1:4
+        //  if growth_count(select_room,dir_count)-growth_num(1,dir_count)>0 .. // 成長可能かチェック＆現時点の成長可能面積が最大の方向を選択
+        //  & (growth_count(select_room,dir_count)-growth_num(1,dir_count))*(seed_distance(select_room,dir_count,2,individual_num)+seed_distance(select_room,dir_count,3,individual_num)+1) < min_growth
+        //    min_growth=(growth_count(select_room,dir_count)-growth_num(1,dir_count))*(seed_distance(select_room,dir_count,2,individual_num)+seed_distance(select_room,dir_count,3,individual_num)+1);
+        //    select_dir=dir_count;
+        //  end
+        //end
+        //growth_num(1,select_dir)=growth_num(1,select_dir)+1;
+        //grow=grow-1;
+        
+        //ランダムに方向を選択
+        //dir_sum=0;
+        //for dir_count=1:4
+        //  if growth_count(select_room,dir_count)-growth_num(1,dir_count)>0 //成長可能かチェック＆ルーレット作成
+        //    dir_sum=dir_factor(1,dir_count)/sum(dir_factor(1,1:4))+dir_sum;
+        //    dir_prob(dir_count,individual_num) = dir_sum;
+        //  else
+        //    dir_prob(dir_count,individual_num) = 0;
+        //  end
+        //end
+        //select_dir=0;
+        //rand_num=rand();//0~1の一様分布乱数
+        //dir_count=1;
+        //while select_dir==0
+        //  if rand_num<=dir_prob(dir_count,individual_num)// & dir_prob(dir_count,individual_num)~=0
+        //    select_dir=dir_count;
+        //  else
+        //    dir_count=dir_count+1;
+        //  end
+        //end
+        //growth_num(1,select_dir)=growth_num(1,select_dir)+1;
+        //grow=grow-1;
+        //if growth_count(select_room,select_dir)-growth_num(1,select_dir)<=0//成長できなくなったらその方向のdir_factorをゼロにして選択候補から外す
+        //  dir_factor(1,select_dir)=0;
+        //end
+
+      end
 //pause
       //成長      
       //North
