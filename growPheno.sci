@@ -1,9 +1,9 @@
 function growPheno
-  
-// 2016/02/12 （目標面積－現在面積）により部屋の選択確率を決定
+
+// 2016/02/11 部屋を目標面積に比例して選択＆成長させる、成長の方向は成長可能なエリアが最小or最大な方へ
 
 global individuals rooms x_span y_span rooms Geno Pheno Desirable_area
-//room_prob room_available seed_distance growth_area seed_distance ..
+//select_prob room_available seed_distance growth_area seed_distance ..
 //end_flag common_flag  Direction_flag room_flag count
 
 //フェノタイプ（表現型）雛形の作成
@@ -21,10 +21,8 @@ Pheno(2:x_span+2,y_span+2,:)=10;
 Direction_flag=zeros(rooms,4,individuals); // 部屋、方向ごとに成長するかを判断するフラグ
 room_flag=zeros(rooms,individuals); // 部屋単位で成長できるかを判断するフラグ(Direction_flagが一つでも立てばこれも立つ)
 end_flag=0;
-room_prob=zeros(rooms,individuals); // 選択確率計算に必要
-room_excd_prob=zeros(rooms,individuals); // 選択確率計算に必要、目標面積を超過した部屋はこちらの群
+select_prob=zeros(rooms,individuals); // 選択確率計算に必要
 room_available=zeros(rooms,individuals); // 選択確率計算に必要
-room_excd=zeros(rooms,individuals); // 選択確率計算に必要、目標面積を超過した超過した部屋はこちらの群
 growth_area=zeros(rooms,4,individuals); // 各方向ごとに成長できるエリアの面積
 
 dir_prob=zeros(4,individuals); // 方向選択に必要、部屋が変わるごとに更新
@@ -51,10 +49,8 @@ for individual_num=1:individuals
     growth_area(:,:,individual_num)=0;
     Direction_flag(:,:,individual_num)=0;
     room_flag(:,individual_num)=0;
-    room_prob(:,individual_num)=0;
-    room_excd_prob(:,individual_num)=0;
+    select_prob(:,individual_num)=0;
     room_available(:,individual_num)=0;
-    room_excd(:,individual_num)=0;
     for room_num=1:rooms
       dir_prob(:,:)=0;
       //種から各方向のエリア端までの距離(seed_distance)を計算
@@ -215,101 +211,53 @@ for individual_num=1:individuals
       //選択確率計算
       for room_num=1:rooms // 成長できない部屋を除外
         if room_flag(room_num,individual_num)==1
-          if Desirable_area(room_num) - (seed_distance(room_num,1,individual_num) + seed_distance(room_num,3,individual_num) + 1) ..
-          * (seed_distance(room_num,2,individual_num) + seed_distance(room_num,4,individual_num) + 1) > 0 // 現在の部屋の面積が目標に達していなければ
-            room_available(room_num,individual_num) = Desirable_area(room_num) - (seed_distance(room_num,1,individual_num) + seed_distance(room_num,3,individual_num) + 1) ..
-            * (seed_distance(room_num,2,individual_num) + seed_distance(room_num,4,individual_num) + 1);
-          else // 目標面積を超過していたら超過している分だけ選ばれにくくする
-            if (seed_distance(room_num,1,individual_num) + seed_distance(room_num,3,individual_num) + 1) .. // 計算式分母が0になるときの例外処理
-            * (seed_distance(room_num,2,individual_num) + seed_distance(room_num,4,individual_num) + 1) - Desirable_area(room_num) == 0
-              room_excd(room_num,individual_num) = 1;
-            else
-              room_excd(room_num,individual_num) =  1 / ((seed_distance(room_num,1,individual_num) + seed_distance(room_num,3,individual_num) + 1) .. // 超過面積の逆数
-            * (seed_distance(room_num,2,individual_num) + seed_distance(room_num,4,individual_num) + 1) - Desirable_area(room_num));
-            end
-          end
+          room_available(room_num,individual_num) = Desirable_area(room_num);
         else
           room_available(room_num,individual_num) = 0;
-          room_excd(room_num,individual_num) = 0;
-        end//room_flagのif
+        end//if
       end
       room_sum=0;
-      room_sum2=0;
       for room_num=1:rooms // 選択確率を計算、ルーレット選択
         if room_available(room_num,individual_num)~=0
           room_sum = room_available(room_num,individual_num)/sum(room_available(1:rooms,individual_num))+ room_sum;
-          room_prob(room_num,individual_num) = room_sum;
+          select_prob(room_num,individual_num) = room_sum;
         else
-          room_prob(room_num,individual_num) = 0;
-        end
-        if room_excd(room_num,individual_num)~=0
-          room_sum2 = room_excd(room_num,individual_num)/sum(room_excd(1:rooms,individual_num))+ room_sum2;
-          room_excd_prob(room_num,individual_num) = room_sum2;
-        else
-          room_excd_prob(room_num,individual_num) = 0;
+          select_prob(room_num,individual_num) = 0;
         end
       end
 
       //部屋選択
-      A_flag=0;
-      for room_num=1:rooms
-        if room_available(room_num,individual_num) ~=0 // 目標面積に達していない部屋が一つでもあればそれら(A群=room_available)から選ぶ
-          A_flag = 1;
-        end
-      end
       select_room=0;
       rand_num=rand();//0~1の一様分布乱数
       room_num=1;
-      //A群またはB群からルーレット選択
-      if A_flag == 1
-        while select_room==0 //A群
-          if rand_num<=room_prob(room_num,individual_num)
-            select_room=room_num;
-          else
-            room_num=room_num+1;
-          end
-        end
-      else
-        while select_room==0 //B群
-          if rand_num<=room_excd_prob(room_num,individual_num)
-            select_room=room_num;
-          else
-            room_num=room_num+1;
-          end
+      while select_room==0
+        if rand_num<=select_prob(room_num,individual_num)// & select_prob(room_num,individual_num)~=0
+          select_room=room_num;
+        else
+          room_num=room_num+1;
         end
       end
 //      for room_num=1:rooms
-//        if rand_num>=room_prob(room_num,individual_num) & room_prob(room_num,individual_num)~=0
+//        if rand_num>=select_prob(room_num,individual_num) & select_prob(room_num,individual_num)~=0
 //          select_room=room_num;
 //        end
 //      end
 //pause
-      //方向選択
-      dir_sum=0;
-      for dir_num=1:4
-        if Direction_flag(select_room,dir_num,individual_num)~=0
-          dir_sum=Direction_flag(select_room,dir_num,individual_num)/sum(Direction_flag(select_room,1:4,individual_num))+dir_sum;
-          dir_prob(dir_num,individual_num) = dir_sum;
-        else
-          dir_prob(dir_num,individual_num) = 0;
-        end
-      end
+
+      //方向選択 成長エリアが最大or最小を選択。
+      //最大、仕様で部屋番号＝添え字だけでなく部屋の大きさも代入しないといけないみたい
+      //[dir_size,select_dir]=maxi(growth_area(select_room,1:4,individual_num));
+
+      //最小、ゼロを除外しないとダメなので個別に
       select_dir=0;
-      rand_num=rand();//0~1の一様分布乱数
-      dir_num=1;
-      while select_dir==0
-        if rand_num<=dir_prob(dir_num,individual_num)// & dir_prob(dir_num,individual_num)~=0
-          select_dir=dir_num;
-        else
-          dir_num=dir_num+1;
+      min_growth=100000; //適当に大きな数
+      for dir_count=1:4
+        if growth_area(select_room,dir_count,individual_num)~=0 ..
+        & growth_area(select_room,dir_count,individual_num) < min_growth
+          select_dir=dir_count;
         end
       end
-//      for dir_num=1:4
-//        if rand_num>=dir_prob(dir_num,individual_num) & dir_prob(dir_num,individual_num)~=0
-//          select_dir=dir_num;
-//        end
-//      end
-//pause
+
       //成長      
       //North
       if Direction_flag(select_room,1,individual_num)==1 & select_dir==1
@@ -373,6 +321,8 @@ for individual_num=1:individuals
 //  pause
 end //individual_num
 
+//pause
+
 // 0(void space)->11(void space)
 for individual_num=1:individuals
   for y=2:y_span+1
@@ -394,5 +344,6 @@ end
 //  end
 //end
 //pause
+
 
 endfunction
