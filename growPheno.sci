@@ -425,7 +425,7 @@ for individual_num=1:individuals
       end
 
       //成長数決定
-      grow=2;
+      grow=4;
       //正方形を優先（左が成長できないなら右、上が成長できないなら下、もしくはそれぞれの逆）手法はrandom、max、minのどれか→無理なら候補から更にrandom、max、min（手法変更で2箇所変更）
       //最大
       //上が成長できるなら成長を割り当て
@@ -611,7 +611,6 @@ for individual_num=1:individuals
         (((seed_distance(room_num,2,1,individual_num)+seed_distance(room_num,4,1,individual_num)+1+growth_num(1,2)+growth_num(1,4))) / ..
         ((seed_distance(room_num,1,1,individual_num)+seed_distance(room_num,3,1,individual_num)+1+growth_num(1,1)+growth_num(1,3))+ ..
         (seed_distance(room_num,2,1,individual_num)+seed_distance(room_num,4,1,individual_num)+1+growth_num(1,2)+growth_num(1,4))));
-
         //縦横の確率を求める
         proportion_prob(1,individual_num)=present_proportion(1,1)/(present_proportion(1,1)+present_proportion(1,2));
         proportion_prob(2,individual_num)=present_proportion(1,2)/(present_proportion(1,1)+present_proportion(1,2));
@@ -623,7 +622,6 @@ for individual_num=1:individuals
           proportion_prob(1,individual_num)=0;
           proportion_prob(2,individual_num)=1;
         end
-        
         //各方向に配分
         if growth_count(select_room,1)-growth_num(1,1)>0 // 成長可能かチェック
           if growth_count(select_room,3)-growth_num(1,3)>0
@@ -657,7 +655,6 @@ for individual_num=1:individuals
             dir_prob(4,individual_num)=0;
           end
         end
-//pause
         //ルーレット作成
         roulette=zeros(1,4);
         roulette(1,1)=dir_prob(1,individual_num);
@@ -685,7 +682,6 @@ for individual_num=1:individuals
         //if growth_count(select_room,select_dir)-growth_num(1,select_dir)<=0//成長できなくなったらその方向のdir_factorをゼロにして選択候補から外す
         //  dir_factor(1,select_dir)=0;
         //end
-
       end
 
       //成長      
