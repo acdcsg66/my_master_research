@@ -403,6 +403,7 @@ for individual_num=1:individuals
         end
       end
       select_room=0;
+      rand('seed',getdate('s'))
       rand_num=rand();//0~1の一様分布乱数
       room_num=1;
       //A群またはB群からルーレット選択 A群…まだ目標面積を超過していない部屋群　B群…すでに目標面積を超過した部屋群
@@ -425,7 +426,7 @@ for individual_num=1:individuals
       end
 
       //成長数決定
-      grow=4;
+      grow=2;
       //正方形を優先（左が成長できないなら右、上が成長できないなら下、もしくはそれぞれの逆）手法はrandom、max、minのどれか→無理なら候補から更にrandom、max、min（手法変更で2箇所変更）
       //最大
       //上が成長できるなら成長を割り当て
@@ -668,6 +669,7 @@ for individual_num=1:individuals
           end
         end
         select_dir=0;
+        rand('seed',getdate('s'))
         rand_num=rand();//0~1の一様分布乱数
         dir_count=1;
         while select_dir==0

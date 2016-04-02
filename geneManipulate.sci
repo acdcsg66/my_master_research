@@ -46,6 +46,7 @@ while child_num<=children
 
   //crossover(一様交叉)
   for keta=1:ketaSize
+    rand('seed',getdate('s'))
     if rand()<0.5
       ChildBinary(child_num,keta)=GenoBinary(Pair(child_num,1),keta);
     else
@@ -55,6 +56,7 @@ while child_num<=children
 
   //mutation(突然変異)
   for keta=1:ketaSize
+    rand('seed',getdate('s'))
     if rand()<mutationRate //突然変異率以下ならビットを反転
       if ChildBinary(child_num,keta)==0
         ChildBinary(child_num,keta)=1;
