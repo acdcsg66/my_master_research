@@ -56,7 +56,7 @@ for children_num=1:children
 
   //parent1
   parent1=0;
-  rand('seed',getdate('s'))
+  //rand('seed',getdate('s'))
   roulette=rand();
     for individual_num=1:individuals
     if roulette>FitnessNormal(individual_num)
@@ -70,7 +70,7 @@ for children_num=1:children
   //parent2
   parent2=0;
   while parent2==0
-    rand('seed',getdate('s'))
+    //rand('seed',getdate('s'))
     roulette=rand();
     for individual_num=1:individuals
       if roulette>FitnessNormal(individual_num)

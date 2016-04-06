@@ -403,7 +403,7 @@ for individual_num=1:individuals
         end
       end
       select_room=0;
-      rand('seed',getdate('s'))
+      //rand('seed',getdate('s'))
       rand_num=rand();//0~1の一様分布乱数
       room_num=1;
       //A群またはB群からルーレット選択 A群…まだ目標面積を超過していない部屋群　B群…すでに目標面積を超過した部屋群
@@ -669,7 +669,7 @@ for individual_num=1:individuals
           end
         end
         select_dir=0;
-        rand('seed',getdate('s'))
+        //rand('seed',getdate('s'))
         rand_num=rand();//0~1の一様分布乱数
         dir_count=1;
         while select_dir==0

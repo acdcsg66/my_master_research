@@ -7,7 +7,7 @@ for children_num=1:children
 
   //parent1
   parent1=0;
-  rand('seed',getdate('s'))
+  //rand('seed',getdate('s'))
   roulette=rand();
   for candidate_num=1:subproblem_neighbors
     if roulette<=(candidate_num/subproblem_neighbors)
@@ -19,7 +19,7 @@ for children_num=1:children
   //parent2
   parent2=0;
   while parent2==0
-    rand('seed',getdate('s'))
+    //rand('seed',getdate('s'))
     roulette=rand();
     for candidate_num=1:subproblem_neighbors //debug: 親個体1を除外して近隣個体群を構成しなおさないで良いか？
       if roulette<=(candidate_num/subproblem_neighbors) & parent1~=candidate_num //parent1~=parent2
