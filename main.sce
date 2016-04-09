@@ -22,7 +22,7 @@ exec moea_d_update.sci
 
 //グローバル変数
 global x_span y_span rooms individuals Geno Pheno objectives Objective Pareto ..
-generations generation_num Pair GenoBinary children ChildBinary Child mutationRate ..
+generations generation_num Pair GenoBinary children ChildBinary Child mutationRate records ..
 Desirable_area Desirable_proportion sigma_share exponent_share sample_num subproblem_fitness subproblem_weight subproblem_neighbor subproblem_neighbors
 
 //定数設定
@@ -30,7 +30,7 @@ x_span=7+5;//span to x-direction
 y_span=7;//span to y-direction
 rooms=7;//number of room-type
 objectives=6;//Area,Proportion,Circulation,Sunlight,InnerWall,Pipe,IEC
-generations=200;//世代数
+generations=10;//世代数
 samples=10;//サンプル数は2以上にしないと行列の都合でエラーが出る？
 individuals=21; //個体数
 //sigma_share=49/4; //0<シェアリング(半径)<=(x_span*y_span) //debug: NSGA-II用？
@@ -40,7 +40,7 @@ Desirable_area=[20,16,12,12,12,9,1]; //Area Size - LR,DK,BR1,BR2,BR3,WA,Path
 Desirable_proportion(1:rooms,1:2)=0.5; // 2は縦:横の比．現在はすべて正方形が最良
 best_so_far=zeros(1,objectives); //各目的ごとに過去にbest fitness（単目的評価）
 subproblem_neighbors=5; //近隣個体の数（次で説明）
-subproblem_neighbor=zeros(individuals,subproblem_neighbors+1,3); //各個体は近隣の個体を交差させ子個体を生成．neighbor+1はアルゴリズムの都合．2は1個体番号標）と2（座標），3（評価値）
+subproblem_neighbor=zeros(individuals,subproblem_neighbors+1,3); //各個体は近隣の個体を交差させ子個体を生成．neighbor+1はアルゴリズムの都合．3は1(個体番号標）と2（距離），3（評価値）
 subproblem_weight=zeros(individuals,objectives); //それぞれの個体がもつfitnessへの重みベクトル．試行中の初めに一度初期化したら固定
 subproblem_fitness=zeros(1,individuals);
 //sorted_distance=zeros();
@@ -51,13 +51,12 @@ mutationRate=0.01; //突然変異率0～1
 
 getdate()
 
-moea_d_initialize();
-
 //main loop////////////////////////////////////////////////////////////////////
 schedule();
 for sample_num=1:samples
   planFig();
   randGeno();
+  moea_d_initialize(); // MOEA/D
   for generation_num=1:generations
     //// NSGA-II
     //growPheno();
@@ -70,7 +69,7 @@ for sample_num=1:samples
     //selectPair();
     //geneManipulate(); 
     
-    // MOEA/D 上で初期化した重みもMOEA/Dで使用
+    // MOEA/D 上のmoead_initialize()もMOEA/Dで使用
     growPheno();
     //IEC(Display&Evaluate)
     //xset("wpdim",700,300)
@@ -81,12 +80,14 @@ for sample_num=1:samples
     //Objective(:,:,generation_num,sample_num)
     moea_d_selectPair(); //MOEA/Dの方法で親個体選択
     geneManipulate(); 
-    moea_d_update(); //debug: これからMOEA/D用に修正  
+    moea_d_update(); //debug: これからMOEA/D用に修正
+
   end //for generation_num
   for individual_num=1:individuals
     subplot(3,7,individual_num);
     Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
   end
+pause
 end //for sample_num
 ///////////////////////////////////////////////////////////////////////////////
 getdate()

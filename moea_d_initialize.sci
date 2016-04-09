@@ -3,8 +3,6 @@ function moea_d_initialize
 global objectives individuals rooms subproblem_fitness subproblem_weight subproblem_neighbors Pair children ..
 generations rooms subproblem_neighbors best_so_far subproblem_neighbor records
 
-records=zeros(individuals,rooms,3); //1=x座標, 2=y座標, 3=fitness
-
 //// MOEA/Dで用いる重みベクトルを決定 現在は単純に一様分布の乱数から重み決定（個体ごとに，全目的の総和は1） //ToDo: 本当はもっとしっかりとした手法で重みづけ
 //for individual_num=1:individuals
 //  budget=1;
@@ -35,12 +33,21 @@ for individual_num=1:individuals
 end
 
 // weighted sum approach
-for objective_num=1:objectives
-  subproblem_fitness(1,1)=subproblem_weight(1,objective_num)*Objective(1,objective_num,generation_num,sample_num);
-end
-for individual_num=2:individuals
+//for individual_num=1:individuals
+//  subproblem_fitness(1,individual_num)=subproblem_weight(individual_num,1)*Objective(individual_num,1,generation_num,sample_num);
+//end
+//for individual_num=1:individuals
+//  for objective_num=2:objectives
+//    subproblem_fitness(1,individual_num) = subproblem_fitness(1,individual_num-1) + ..
+//    subproblem_weight(individual_num,objective_num) * Objective(individual_num,objective_num,generation_num,sample_num);
+//  end
+//end
+
+// weighted sum approach
+//subproblem_fitness=zeros(1,individual_num);
+for individual_num=1:individuals
   for objective_num=1:objectives
-    subproblem_fitness(1,individual_num) = subproblem_fitness(1,individual_num-1) + ..
+    subproblem_fitness(1,individual_num) = subproblem_fitness(1,individual_num) + ..
     subproblem_weight(individual_num,objective_num) * Objective(individual_num,objective_num,generation_num,sample_num);
   end
 end
@@ -68,10 +75,11 @@ for individual_num=1:individuals
         subproblem_neighbor(individual_num,neighbor_num+1,2)=subproblem_neighbor(individual_num,neighbor_num,2);
         subproblem_neighbor(individual_num,neighbor_num,1)=comparison_num; //個体番号代入
         subproblem_neighbor(individual_num,neighbor_num,2)=distance(individual_num,comparison_num); //距離代入
-      elseif subproblem_neighbor(individual_num,neighbor_num,2) == 0 .. //まだ代入されていないならそのまま代入
-      & individual_num ~= comparison_num // 比較対象が自分自身のとき除外
-        subproblem_neighbor(individual_num,neighbor_num,1)=comparison_num; //個体番号代入
-        subproblem_neighbor(individual_num,neighbor_num,2)=distance(individual_num,comparison_num); //距離代入
+      //elseif subproblem_neighbor(individual_num,neighbor_num,2) == 0 .. //まだ代入されていないならそのまま代入
+      //& individual_num ~= comparison_num // 比較対象が自分自身のとき除外
+      //  subproblem_neighbor(individual_num,neighbor_num,1)=comparison_num; //個体番号代入
+      //  subproblem_neighbor(individual_num,neighbor_num,2)=distance(individual_num,comparison_num); //距離代入
+      //  pause
       end
     end
   end
@@ -79,7 +87,7 @@ end
 // 近隣個体のfitnessを代入
 for individual_num=1:individuals
   for neighbor_num=1:subproblem_neighbors
-    subproblem_neighbor(individual_num,neighbor_num,3)=subproblem_fitness(1,individual_num);
+    subproblem_neighbor(individual_num,neighbor_num,3)=subproblem_fitness(1,subproblem_neighbor(individual_num,neighbor_num,1));
   end
 end
 
@@ -89,5 +97,6 @@ for individual_num=1:individuals
     records(individual_num,room_num,1:2)=Geno(room_num,1:2,individual_num);
   end
 end
+records(individual_num,:,3)=0; //debug: 0で良い？
 
 endfunction
