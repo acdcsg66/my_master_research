@@ -23,14 +23,17 @@ exec moea_d_update.sci
 //グローバル変数
 global x_span y_span rooms individuals Geno Pheno objectives Objective Pareto ..
 generations generation_num Pair GenoBinary children ChildBinary Child mutationRate records ..
-Desirable_area Desirable_proportion sigma_share exponent_share sample_num subproblem_fitness subproblem_weight subproblem_neighbor subproblem_neighbors
+Desirable_area Desirable_proportion sigma_share exponent_share sample_num subproblem_fitness ..
+subproblem_weight subproblem_neighbor subproblem_neighbors BIG_NUM old_num best_so_far
 
 //定数設定
+BIG_NUM=10000; //適当に大きな数
+old_num=zeros(1,individuals); // Tchebycheffメソッドで最適化する目的関数が変わったときを判断する
 x_span=7+5;//span to x-direction
 y_span=7;//span to y-direction
 rooms=7;//number of room-type
 objectives=6;//Area,Proportion,Circulation,Sunlight,InnerWall,Pipe,IEC
-generations=10;//世代数
+generations=50;//世代数
 samples=10;//サンプル数は2以上にしないと行列の都合でエラーが出る？
 individuals=21; //個体数
 //sigma_share=49/4; //0<シェアリング(半径)<=(x_span*y_span) //debug: NSGA-II用？
@@ -38,11 +41,11 @@ individuals=21; //個体数
 children=individuals; //1世代で作る子供の数(親と子供を総入替えするので同じ数にした)
 Desirable_area=[20,16,12,12,12,9,1]; //Area Size - LR,DK,BR1,BR2,BR3,WA,Path
 Desirable_proportion(1:rooms,1:2)=0.5; // 2は縦:横の比．現在はすべて正方形が最良
-best_so_far=zeros(1,objectives); //各目的ごとに過去にbest fitness（単目的評価）
+best_so_far=zeros(2,individuals); //各目的ごとに過去のbest fitness（単目的評価）．1(fitness)と2(目的番号)
 subproblem_neighbors=5; //近隣個体の数（次で説明）
 subproblem_neighbor=zeros(individuals,subproblem_neighbors+1,3); //各個体は近隣の個体を交差させ子個体を生成．neighbor+1はアルゴリズムの都合．3は1(個体番号標）と2（距離），3（評価値）
 subproblem_weight=zeros(individuals,objectives); //それぞれの個体がもつfitnessへの重みベクトル．試行中の初めに一度初期化したら固定
-subproblem_fitness=zeros(1,individuals);
+subproblem_fitness=zeros(1,individuals); //個体ごとに単目的化，分解された目的関数．適当に大きな数で初期化
 //sorted_distance=zeros();
 Geno=zeros(rooms,2,individuals); //ゲノタイプ（遺伝子型）
 Objective=zeros(individuals,objectives,generations,samples);
@@ -87,7 +90,7 @@ for sample_num=1:samples
     subplot(3,7,individual_num);
     Matplot(Pheno(:,:,individual_num),'040'); //xgrid();
   end
-pause
+
 end //for sample_num
 ///////////////////////////////////////////////////////////////////////////////
 getdate()

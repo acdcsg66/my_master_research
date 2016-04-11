@@ -1,6 +1,6 @@
 function moea_d_selectPair
 
-global objectives individuals subproblem_fitness subproblem_weight subproblem_neighbors Pair children generations rooms subproblem_neighbors best_so_far subproblem_neighbor
+global objectives individuals subproblem_fitness subproblem_weight subproblem_neighbors Pair children generations rooms subproblem_neighbors subproblem_neighbor
 
 //eŒÂ‘Ì‘I‘ğ
 for children_num=1:children

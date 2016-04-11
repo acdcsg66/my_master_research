@@ -8,7 +8,7 @@ global individuals rooms x_span y_span Geno sample_num
 //rand('seed',N)
 
 //“¯‚¶ğŒ‚ÅÀŒ±‚·‚é‚½‚ßƒTƒ“ƒvƒ‹”‚Å—”‚ğ’è‹`‚·‚é
-//rand('seed',sample_num)
+rand('seed',sample_num)
 //rand('seed',1)
 
 individual_num=1;

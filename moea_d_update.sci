@@ -1,21 +1,20 @@
 function moea_d_update
 
-global objectives individuals generations rooms subproblem_neighbors best_so_far subproblem_neighbor rooms records subproblem_fitness generation_num sample_num
+global objectives individuals generations rooms subproblem_neighbors subproblem_neighbor rooms records subproblem_fitness generation_num sample_num old_num
 
 distance=zeros(individuals,individuals); //多目的空間の個体間距離
 
-// 単目的で過去のベストfitness値、目的ごとに Tchebycheff
-for objective_num=1:objectives
-  best_so_far(1,objective_num)=max(Objective(:,objective_num,generation_num,sample_num),'r');
-end
-
 // 更新
 for individual_num=1:individuals
-  if records(individual_num,1,3) < subproblem_fitness(1,individual_num) // fitnessが高くなったら更新
+  if records(individual_num,1,3) > subproblem_fitness(1,individual_num) .. // fitnessが低くなったら（←Tchebycheffは最小化問題なので）更新
+  | old_num(1,individual_num) ~= best_so_far(2,individual_num) //または最適化する目的関数が変わったら更新
     for room_num=1:rooms
       records(individual_num,room_num,1:2)=Geno(room_num,1:2,individual_num);
     end
     records(individual_num,:,3)=subproblem_fitness(1,individual_num);
+    if old_num(1,individual_num) ~= best_so_far(2,individual_num)
+      old_num(1,individual_num) = best_so_far(2,individual_num);
+    end
   end
 end
 // fitnessが良好になった個体が更新される（それ以外は同じ値が代入される）
@@ -73,6 +72,5 @@ end
 //    end
 //  end
 //end
-
 
 endfunction

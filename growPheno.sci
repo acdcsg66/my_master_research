@@ -2,7 +2,7 @@ function growPheno
   
 // 2016/02/17 （目標面積－現在面積）により部屋の選択確率を決定（方向は仕様を元に確率選択）
 
-global individuals rooms x_span y_span rooms Geno Pheno Desirable_area Desirable_proportion
+global individuals rooms x_span y_span rooms Geno Pheno Desirable_area Desirable_proportion BIG_NUM
 //room_prob room_available seed_distance growth_area seed_distance ..
 //end_flag common_flag  Direction_flag room_flag count
 
@@ -565,7 +565,7 @@ for individual_num=1:individuals
 
         //最小、成長可能エリアがゼロの方向を除外
         //select_dir=0;
-        //min_growth=100000; //適当に大きな数
+        //min_growth=BIG_NUM; //適当に大きな数
         //for dir_count=1:4
         //  if growth_count(select_room,dir_count)-growth_num(1,dir_count)>0 .. // 成長可能かチェック＆現時点の成長可能面積が最小の方向を選択
         //  & (growth_count(select_room,dir_count)-growth_num(1,dir_count))*(seed_distance(select_room,dir_count,2,individual_num)+seed_distance(select_room,dir_count,3,individual_num)+1) < min_growth

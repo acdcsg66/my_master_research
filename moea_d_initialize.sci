@@ -1,7 +1,7 @@
 function moea_d_initialize
 
 global objectives individuals rooms subproblem_fitness subproblem_weight subproblem_neighbors Pair children ..
-generations rooms subproblem_neighbors best_so_far subproblem_neighbor records
+generations rooms subproblem_neighbors subproblem_neighbor records BIG_NUM
 
 //// MOEA/Dで用いる重みベクトルを決定 現在は単純に一様分布の乱数から重み決定（個体ごとに，全目的の総和は1） //ToDo: 本当はもっとしっかりとした手法で重みづけ
 //for individual_num=1:individuals
@@ -64,7 +64,7 @@ for individual_num=1:individuals
   end
 end
 // 近隣個体
-subproblem_neighbor(:,:,2)=10000 //適当に大きな数で初期化しておく
+subproblem_neighbor(:,:,2)=BIG_NUM //適当に大きな数で初期化しておく
 //subproblem_neighbor(:,1,2)=0 //初めの要素だけ0
 for individual_num=1:individuals
   for comparison_num=1:individuals
@@ -97,6 +97,6 @@ for individual_num=1:individuals
     records(individual_num,room_num,1:2)=Geno(room_num,1:2,individual_num);
   end
 end
-records(individual_num,:,3)=0; //debug: 0で良い？
+records(:,:,3)=BIG_NUM;
 
 endfunction
