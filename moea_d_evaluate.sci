@@ -1,6 +1,6 @@
 function moea_d_evaluate
 
-global objectives individuals subproblem_fitness subproblem_weight best_so_far
+global objectives individuals subproblem_fitness subproblem_weight best_so_far present_objective
 
 distance=zeros(individuals,individuals); //多目的空間の個体間距離
 Pair=zeros(children,2);
@@ -19,7 +19,6 @@ for individual_num=1:individuals
   for objective_num=1:objectives
     if best_so_far(1,individual_num) < Objective(individual_num,objective_num,generation_num,sample_num) // 右辺の最大値を代入
       best_so_far(1,individual_num) = Objective(individual_num,objective_num,generation_num,sample_num); //fitness
-      best_so_far(2,individual_num) = objective_num; //目的番号
     end
   end
 end
@@ -29,10 +28,13 @@ for individual_num=1:individuals
   for objective_num=1:objectives
     if subproblem_fitness(1,individual_num) < subproblem_weight(individual_num,objective_num) * ..
     abs(Objective(individual_num,objective_num,generation_num,sample_num) - best_so_far(1,individual_num))
-      subproblem_fitness(1,individual_num) = subproblem_weight(individual_num,objective_num) * ..
-      abs(Objective(individual_num,objective_num,generation_num,sample_num) - best_so_far(1,individual_num));
+      subproblem_fitness(1,individual_num) = subproblem_weight(individual_num,objective_num) * .. //右辺が最大値になる目的を最適化する
+      abs(Objective(individual_num,objective_num,generation_num,sample_num) - best_so_far(1,individual_num)); 
+      present_objective(1,individual_num) = objective_num; //最適化する目的番号
     end
   end
 end
+
+
 
 endfunction

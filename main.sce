@@ -22,13 +22,12 @@ exec moea_d_update.sci
 
 //グローバル変数
 global x_span y_span rooms individuals Geno Pheno objectives Objective Pareto ..
-generations generation_num Pair GenoBinary children ChildBinary Child mutationRate records ..
+generations generation_num Pair GenoBinary children ChildBinary Child mutationRate tche_records tche_records present_num ..
 Desirable_area Desirable_proportion sigma_share exponent_share sample_num subproblem_fitness ..
-subproblem_weight subproblem_neighbor subproblem_neighbors BIG_NUM old_num best_so_far
+subproblem_weight subproblem_neighbor subproblem_neighbors BIG_NUM best_so_far
 
 //定数設定
 BIG_NUM=10000; //適当に大きな数
-old_num=zeros(1,individuals); // Tchebycheffメソッドで最適化する目的関数が変わったときを判断する
 x_span=7+5;//span to x-direction
 y_span=7;//span to y-direction
 rooms=7;//number of room-type
@@ -41,11 +40,14 @@ individuals=21; //個体数
 children=individuals; //1世代で作る子供の数(親と子供を総入替えするので同じ数にした)
 Desirable_area=[20,16,12,12,12,9,1]; //Area Size - LR,DK,BR1,BR2,BR3,WA,Path
 Desirable_proportion(1:rooms,1:2)=0.5; // 2は縦:横の比．現在はすべて正方形が最良
-best_so_far=zeros(2,individuals); //各目的ごとに過去のbest fitness（単目的評価）．1(fitness)と2(目的番号)
+best_so_far=zeros(1,individuals); //各目的ごとに過去のbest fitness（単目的評価）
 subproblem_neighbors=5; //近隣個体の数（次で説明）
 subproblem_neighbor=zeros(individuals,subproblem_neighbors+1,3); //各個体は近隣の個体を交差させ子個体を生成．neighbor+1はアルゴリズムの都合．3は1(個体番号標）と2（距離），3（評価値）
 subproblem_weight=zeros(individuals,objectives); //それぞれの個体がもつfitnessへの重みベクトル．試行中の初めに一度初期化したら固定
 subproblem_fitness=zeros(1,individuals); //個体ごとに単目的化，分解された目的関数．適当に大きな数で初期化
+records=zeros(individuals,rooms,2); //記録1　更新するかどうかを決める（各個体の部屋の種座標とfitnessを保存）
+tche_records(1:individuals,1:objectives)=BIG_NUM; // 記録2 Tchebycheff methodで最適化する目的関数
+present_num=0; //最適化する目的番号
 //sorted_distance=zeros();
 Geno=zeros(rooms,2,individuals); //ゲノタイプ（遺伝子型）
 Objective=zeros(individuals,objectives,generations,samples);
