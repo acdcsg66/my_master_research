@@ -1,23 +1,25 @@
 function moea_d_update
 
-global objectives individuals generations rooms subproblem_neighbors subproblem_neighbor rooms ..
-records tche_records present_objective subproblem_fitness generation_num sample_num
+global objectives individuals generations rooms subproblem_neighbors subproblem_neighbor rooms records subproblem_fitness generation_num sample_num Geno
 
 distance=zeros(individuals,individuals); //多目的空間の個体間距離
 
-// 更新
+// Genoの処理(fitnessが改善しなかった個体を元に戻す)
 for individual_num=1:individuals
-  if tche_records(individual_num,present_objective(1,individual_num)) > subproblem_fitness(1,individual_num) // fitnessが低くなったら（←Tchebycheffは最小化問題なので）更新
+  for room_num=1:rooms
+    if records(individual_num,1,3) > subproblem_fitness(1,individual_num)
+      Geno(room_num,1:2,individual_num)=records(individual_num,room_num,1:2);
+    end
+  end
+end
+
+// recordsの更新
+for individual_num=1:individuals
+  if records(individual_num,1,3) <= subproblem_fitness(1,individual_num)  // fitnessが高くなっているならrecordsの座標更新
     for room_num=1:rooms
       records(individual_num,room_num,1:2)=Geno(room_num,1:2,individual_num);
     end
-    tche_records(individual_num,present_objective(1,individual_num)) = subproblem_fitness(1,individual_num);
-  end
-end
-// fitnessが良好になった個体が更新される（それ以外は同じ値が代入される）
-for individual_num=1:individuals
-  for room_num=1:rooms
-    Geno(room_num,1:2,individual_num)=records(individual_num,room_num,1:2);
+    records(individual_num,:,3)=subproblem_fitness(1,individual_num);
   end
 end
 
@@ -35,6 +37,8 @@ for individual_num=1:individuals
 end
 
 // 近隣個体
+subproblem_neighbor(:,:,1)=0;
+subproblem_neighbor(:,:,2)=BIG_NUM;
 for individual_num=1:individuals
   for comparison_num=1:individuals
     for neighbor_num=subproblem_neighbors:(-1):1 // 要素: subproblem_neighbors+1は実際の処理時には使われない
