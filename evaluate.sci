@@ -1,11 +1,12 @@
 function evaluate
-global rooms individuals y_span x_span Pheno objectives Objective generation_num sample_num
+global rooms individuals y_span x_span Pheno objectives Objective generation_num ..
+sample_num Desirable_area
 
 ProportionWeight=[0.75,0.5,1,1,1,0.25,0];//LR,DK,BR1,BR2,BR3,WA,Path
 //No Zero except for Path!
 
 //Area Size
-Desirable_area=[20,16,12,12,12,9,1];//LR,DK,BR1,BR2,BR3,WA,Path
+//Desirable_area=[20,16,12,12,12,9,1];//LR,DK,BR1,BR2,BR3,WA,Path
 //max_area=x_span*y_span;
 Area=zeros(rooms,2,individuals);//2=>area,score
 //area size count
@@ -103,6 +104,7 @@ for individual_num=1:individuals
   end
 end
 //end of Proportion
+
 
 
 //Relation between rooms
@@ -387,5 +389,7 @@ for individual_num=1:individuals
 
 end // for individual_num
 //end of Objective
+
+
 
 endfunction
